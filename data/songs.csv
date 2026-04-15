@@ -1,18 +1,18 @@
-id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
-1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18
-2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86
-5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05
-6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92
-7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
-10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
-11,Evening Sonata,Velvet Strings,classical,nostalgic,0.30,72,0.55,0.25,0.95
-12,Sunset Campfire,Maple Road,folk,reflective,0.45,98,0.62,0.40,0.82
-13,City Pulse,Beat District,hip hop,energetic,0.85,100,0.68,0.90,0.12
-14,Crystal Lagoon,Aqua Dream,electronic,dreamy,0.52,104,0.77,0.67,0.18
-15,Island Breeze,Rasta Roots,reggae,relaxed,0.50,88,0.75,0.70,0.60
-16,Desert Sunrise,Brass Caravan,world,adventurous,0.58,95,0.69,0.55,0.38
-17,Moonlit Cabin,Hearth Song,country,romantic,0.47,84,0.72,0.50,0.88
+id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,popularity,release_decade,mood_tag,liveness,instrumentalness
+1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18,82,2020,euphoric,0.12,0.02
+2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71,54,2020,focused,0.08,0.85
+3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10,71,2010,aggressive,0.22,0.05
+4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86,48,2020,melancholic,0.05,0.90
+5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05,88,2020,motivational,0.14,0.01
+6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92,39,2010,dreamy,0.06,0.92
+7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89,45,2000,nostalgic,0.35,0.45
+8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,63,2010,melancholic,0.09,0.78
+9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78,57,2020,focused,0.07,0.88
+10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35,69,2010,uplifting,0.18,0.03
+11,Evening Sonata,Velvet Strings,classical,nostalgic,0.30,72,0.55,0.25,0.95,35,2000,nostalgic,0.28,0.98
+12,Sunset Campfire,Maple Road,folk,reflective,0.45,98,0.62,0.40,0.82,42,2010,nostalgic,0.40,0.12
+13,City Pulse,Beat District,hip hop,energetic,0.85,100,0.68,0.90,0.12,79,2020,euphoric,0.16,0.04
+14,Crystal Lagoon,Aqua Dream,electronic,dreamy,0.52,104,0.77,0.67,0.18,66,2010,dreamy,0.07,0.62
+15,Island Breeze,Rasta Roots,reggae,relaxed,0.50,88,0.75,0.70,0.60,58,2000,uplifting,0.45,0.08
+16,Desert Sunrise,Brass Caravan,world,adventurous,0.58,95,0.69,0.55,0.38,44,2010,adventurous,0.52,0.30
+17,Moonlit Cabin,Hearth Song,country,romantic,0.47,84,0.72,0.50,0.88,51,2000,nostalgic,0.38,0.06
