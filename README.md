@@ -1,33 +1,66 @@
-# 🎵 Music Recommender Simulation
+# Music Recommender Simulation
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+This project builds a small music recommender system in Python. It represents songs and a user taste profile as data, scores every song in a 17-track catalog against that profile using a hand-designed algorithm, and returns the top K matches with plain-language explanations. The goal is to explore how real-world recommenders turn structured data into ranked predictions — and where bias and unfairness can sneak in.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+Each `Song` is described by its genre, mood, and five numerical traits: energy, tempo, valence, danceability, and acousticness. The `UserProfile` stores the listener's favorite genre and mood, plus numeric targets for energy, tempo, valence, and danceability, and a boolean for acoustic preference. The recommender scores every song against those preferences and returns the top K matches in ranked order.
 
-Some prompts to answer:
+**Data flow:** Input (UserProfile) → score every song → sort descending → return top K with reasons
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+### Song Features
 
-You can include a simple diagram or bullet list if helpful.
+| Feature | Type | Description |
+|---|---|---|
+| `genre` | string | Musical style (lofi, pop, rock, jazz, …) |
+| `mood` | string | Emotional feel (chill, happy, intense, …) |
+| `energy` | 0–1 float | Intensity level |
+| `tempo_bpm` | float | Beats per minute |
+| `valence` | 0–1 float | Cheerfulness (high = positive, low = moody) |
+| `danceability` | 0–1 float | Groove and rhythmic drive |
+| `acousticness` | 0–1 float | How acoustic vs. electronic the track is |
+
+### UserProfile Fields
+
+`favorite_genre`, `favorite_mood`, `target_energy`, `target_tempo`, `target_valence`, `target_danceability`, `likes_acoustic`
+
+### Algorithm Recipe
+
+Each song starts at 0 and earns points by matching the user profile:
+
+**Categorical rules**
+
+| Rule | Points |
+|---|---|
+| `genre` matches `favorite_genre` | +2.0 |
+| `mood` matches `favorite_mood` | +1.0 |
+
+**Continuous similarity rules** — formula: `max(0, 1 - |song_value - target| / tolerance) × weight`
+
+| Feature | Tolerance | Max points |
+|---|---|---|
+| Energy | ±0.40 | +1.5 |
+| Tempo | ±40 BPM | +1.0 |
+| Valence | ±0.30 | +0.75 |
+| Danceability | ±0.30 | +0.75 |
+
+**Acousticness preference**
+
+- `likes_acoustic = True` AND `acousticness > 0.6` → +0.5
+- `likes_acoustic = False` AND `acousticness < 0.3` → +0.5
+
+**Maximum possible score: 7.5**
+
+### Potential Biases
+
+- **Genre dominates.** At +2.0, a genre match outweighs a perfect mood alignment (+1.0). A great song that fits the user's mood but not their genre will always rank below a mediocre same-genre track.
+- **Small catalog amplifies exact matches.** With 17 songs and 14 unique genres, a genre match is almost a guarantee of a top result — the genre weight is disproportionately powerful at this scale.
+- **Numeric targets assume one ideal point.** A user who enjoys both high-energy and very low-energy songs depending on context will always get mid-energy recommendations.
+- **Acousticness is binary.** Songs in the middle range (0.3–0.6) are ignored by this rule even if they would be enjoyable.
 
 ---
 
@@ -41,34 +74,31 @@ You can include a simple diagram or bullet list if helpful.
    python -m venv .venv
    source .venv/bin/activate      # Mac or Linux
    .venv\Scripts\activate         # Windows
+   ```
 
-2. Install dependencies
+2. Install dependencies:
 
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 3. Run the app:
 
-```bash
-python -m src.main
-```
+   ```bash
+   python -m src.main
+   ```
 
 ### Running Tests
-
-Run the starter tests with:
 
 ```bash
 pytest
 ```
 
-You can add more tests in `tests/test_recommender.py`.
-
 ---
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+Document the experiments you ran. For example:
 
 - What happened when you changed the weight on genre from 2.0 to 0.5
 - What happened when you added tempo or valence to the score
@@ -76,136 +106,11 @@ Use this section to document the experiments you ran. For example:
 
 ---
 
-## Limitations and Risks
-
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
-
----
-
 ## Reflection
 
-Read and complete `model_card.md`:
+See the full model card: [model_card.md](model_card.md)
 
-[**Model Card**](model_card.md)
+Write 1–2 paragraphs here about what you learned:
 
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
-
----
-
-## 7. `model_card_template.md`
-
-Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}  
-
-```markdown
-# 🎧 Model Card - Music Recommender Simulation
-
-## 1. Model Name
-
-Give your recommender a name, for example:
-
-> VibeFinder 1.0
-
----
-
-## 2. Intended Use
-
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
-
----
-
-## 3. How It Works (Short Explanation)
-
-Describe your scoring logic in plain language.
-
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
-
-Try to avoid code in this section, treat it like an explanation to a non programmer.
-
----
-
-## 4. Data
-
-Describe your dataset.
-
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
-
----
-
-## 5. Strengths
-
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
-
----
-
-## 6. Limitations and Bias
-
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
-
----
-
-## 7. Evaluation
-
-How did you check your system
-
-Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
-
----
-
-## 8. Future Work
-
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
-
----
-
-## 9. Personal Reflection
-
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
-
+- How recommenders turn data into predictions
+- Where bias or unfairness could show up in systems like this
