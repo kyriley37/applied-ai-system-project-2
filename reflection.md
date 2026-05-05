@@ -1,4 +1,48 @@
-# Reflection: Profile Comparisons
+# Reflection
+
+---
+
+## Responsible AI: Limitations, Bias, and Collaboration
+
+### What are the limitations or biases in your system?
+
+The most significant bias is **catalog bias** — the song catalog (`songs.csv`) is fictional and was generated as sample data. Every recommendation the system makes is constrained by what's in that catalog, and a fictional catalog doesn't reflect the actual diversity of music that exists. If real data were used, bias could creep in through underrepresentation — for example, if the catalog contained fewer jazz or gospel songs relative to pop, those genres would be systematically disadvantaged no matter how well the scoring engine worked.
+
+The second limitation is **genre label dominance**. Genre and mood are categorical matches — they either fire or they don't. A genre match is worth more points than a near-perfect energy or tempo match in most strategies. This means a mediocre song in the right genre will beat a great song in the wrong genre, which doesn't reflect how people actually experience music.
+
+The third limitation is the **frequency profile itself**. The five dimensions (sub_bass, bass_warmth, vocal_presence, brightness, groove_weight) were hand-designed based on cultural research, not derived from data. They capture what I believe matters about Black American music's sonic identity, but they're still a simplification. Someone could describe a vibe that doesn't map cleanly onto these five dimensions, and the system would still return a result without signaling that the mapping was uncertain.
+
+---
+
+### Could your AI be misused, and how would you prevent that?
+
+The most realistic misuse is **cultural flattening** — using the cultural knowledge base to generate explanations that sound authoritative about Black music history without actually being correct or respectful. Claude can produce confident-sounding cultural context that is partially inaccurate, and a user might not know the difference.
+
+The knowledge base (`cultural_kb.json`) is the main defense against this: by providing grounded, hand-curated context rather than letting Claude improvise from training data, the explanations stay anchored to real cultural facts. The other prevention is transparency — the system shows its scoring reasons alongside every recommendation, so users can see *why* a song was chosen rather than just accepting the explanation at face value.
+
+A less obvious misuse: the system could theoretically be used to generate playlists that exploit cultural associations for commercial purposes without acknowledgment of their origins — "Sunday morning soul feel" as a marketing aesthetic stripped of its cultural meaning. That's harder to prevent technically, but naming it explicitly is a start.
+
+---
+
+### What surprised you while testing the AI's reliability?
+
+The most surprising thing was how the `BadRequestError` from the Anthropic API was indistinguishable between two completely different failure modes — a malformed request and an empty credit balance. Both returned the same error type and triggered the same fallback. This meant the system appeared to "work" (it returned songs via the heuristic fallback) even when the API was completely inaccessible, which could give a false sense of reliability. A well-designed system should surface *why* it fell back, not just that it did.
+
+The second surprise was how robust the scoring engine was to adversarial inputs. The ghost genre profile (metal/angry — neither exists in the catalog) still returned five reasonable songs using only numeric scoring. The extreme-zeros profile still returned valid results. The system didn't crash or return empty lists — it just quietly did the best it could with what it had. That's a good kind of surprise.
+
+---
+
+### Collaboration with AI during this project
+
+This project was built in close collaboration with Claude Code (claude-sonnet-4-6). The AI wrote most of the code across `claude_agent.py`, `cultural_retriever.py`, `frequency_profile.py`, `logger.py`, and the test harness, based on architectural decisions we worked through together in conversation.
+
+**One instance where the AI was genuinely helpful:** When designing the frequency profile system, I described my personal connection to certain bass frequencies and what "Sunday morning soul feel" meant to me culturally. Claude translated that into five concrete dimensions with specific numeric ranges and a mapping from cultural keywords to frequency values. That bridge — from personal cultural knowledge to a structured data model — is something I couldn't have designed as quickly on my own, and it became the most distinctive part of the whole system.
+
+**One instance where the AI's suggestion was flawed:** The `explain_recommendations()` function in `claude_agent.py` originally used `thinking: {type: "adaptive"}` with streaming. This caused a `BadRequestError` in certain configurations because adaptive thinking and streaming have constraints on `claude-opus-4-7` that weren't immediately obvious. The AI wrote the code confidently without flagging this as a potential issue, and it only surfaced during actual testing. The fix was straightforward once the error appeared, but it reinforced that AI-generated code needs to be run and tested — not just read and trusted.
+
+---
+
+# Profile Comparisons
 
 ## High-Energy Pop vs. Chill Lofi
 
