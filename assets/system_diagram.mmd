@@ -1,0 +1,70 @@
+flowchart TD
+    USER([" User\nNatural Language Input\ne.g. warm soulful Sunday feel "])
+
+    USER --> PARSER
+
+    subgraph CLAUDE_IN ["Claude API — Intent Parser"]
+        PARSER["Parse intent\nNatural language → structured\nfrequency profile + cultural query"]
+    end
+
+    subgraph RAG ["RAG — Cultural Knowledge Base"]
+        KB[("cultural_kb.json\nBlack American Music Heritage\nJazz · Gospel · Soul · Funk\nHip-Hop · R&B · Reggae")]
+        RETRIEVER["Retrieve cultural context\nGenre lineage · Frequency signatures\nSonic DNA"]
+        PARSER --> RETRIEVER
+        KB --> RETRIEVER
+    end
+
+    subgraph ENGINE ["Recommender Engine"]
+        FREQ["Frequency Profile Mapper\nfreq_prefs → audio feature weights\nsub_bass · warmth · groove · vocal"]
+        SCORER["score_song + recommend_songs\nWeighted feature scoring\nacross 10+ audio attributes"]
+        DIVERSE["Diversity Penalty\nArtist + genre spread"]
+        CATALOG[("songs.csv\nSong Catalog")]
+        RETRIEVER --> FREQ
+        FREQ --> SCORER
+        CATALOG --> SCORER
+        SCORER --> DIVERSE
+    end
+
+    subgraph CLAUDE_OUT ["Claude API — Explainer"]
+        EXPLAIN["Generate response\nTop-K results + cultural context\n→ natural language explanation"]
+    end
+
+    DIVERSE --> EXPLAIN
+    RETRIEVER --> EXPLAIN
+
+    subgraph OUTPUT ["Output"]
+        RESULT([" Ranked Recommendations\nSong list + cultural explanation\nWhy this frequency resonates "])
+    end
+
+    EXPLAIN --> RESULT
+
+    subgraph RELIABILITY ["Reliability & Observability"]
+        LOGGER["Logger\nTracks retrieval decisions\nscoring rationale · API calls"]
+        TESTER["Test Harness\nRuns profiles × strategies\nChecks consistency + precision"]
+        GUARDRAIL["Guardrails\nFallback if Claude fails\nInput validation"]
+    end
+
+    SCORER --> LOGGER
+    EXPLAIN --> LOGGER
+    TESTER -->|"automated runs"| SCORER
+
+    subgraph HUMAN ["Human-in-the-Loop"]
+        REVIEW([" Human Review\nInspect logs · validate results\nadjust cultural_kb.json "])
+    end
+
+    LOGGER --> REVIEW
+    RESULT --> REVIEW
+
+    style CLAUDE_IN fill:#1a1a2e,color:#e0e0e0,stroke:#7c6af7
+    style RAG fill:#0f2027,color:#e0e0e0,stroke:#00c9a7
+    style ENGINE fill:#1a0a2e,color:#e0e0e0,stroke:#a855f7
+    style CLAUDE_OUT fill:#1a1a2e,color:#e0e0e0,stroke:#7c6af7
+    style OUTPUT fill:#0a1628,color:#e0e0e0,stroke:#3b82f6
+    style RELIABILITY fill:#1a1a0a,color:#e0e0e0,stroke:#eab308
+    style HUMAN fill:#1a0a0a,color:#e0e0e0,stroke:#ef4444
+
+    style USER fill:#7c6af7,color:#fff,stroke:#7c6af7
+    style RESULT fill:#3b82f6,color:#fff,stroke:#3b82f6
+    style REVIEW fill:#ef4444,color:#fff,stroke:#ef4444
+    style KB fill:#00c9a7,color:#111,stroke:#00c9a7
+    style CATALOG fill:#a855f7,color:#fff,stroke:#a855f7

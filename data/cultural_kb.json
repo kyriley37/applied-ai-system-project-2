@@ -1,0 +1,229 @@
+{
+  "genres": {
+    "hip_hop": {
+      "catalog_tags": ["hip hop"],
+      "name": "Hip-Hop",
+      "origins": "South Bronx, New York, 1970s — DJ Kool Herc, Afrika Bambaataa, Grandmaster Flash",
+      "cultural_roots": "Emerged from the convergence of funk, soul, and blues in Black and Latino communities. The breakbeat — isolating the percussion break of a record — became the rhythmic DNA. Sampling transformed the pain and joy of older Black music into new expression.",
+      "frequency_signature": {
+        "sub_bass": 0.9,
+        "bass_warmth": 0.65,
+        "vocal_presence": 0.8,
+        "brightness": 0.55,
+        "groove_weight": 0.9
+      },
+      "audio_feature_hints": {
+        "danceability_floor": 0.7,
+        "acousticness_ceiling": 0.3,
+        "instrumentalness_ceiling": 0.25,
+        "energy_range": [0.6, 1.0]
+      },
+      "sonic_description": "Deep 808 sub-bass that you feel in your chest before you hear it. Punchy kick drums, crisp snares, and rhythmic lyrical flow over sampled loops or live instrumentation.",
+      "keywords": ["bass", "rap", "beats", "flow", "808", "trap", "boom bap", "rhymes", "lyrics", "Brooklyn", "Bronx"]
+    },
+    "jazz": {
+      "catalog_tags": ["jazz"],
+      "name": "Jazz",
+      "origins": "New Orleans, early 1900s — Scott Joplin, Louis Armstrong, Duke Ellington, Miles Davis, John Coltrane",
+      "cultural_roots": "Born from the blues and spirituals of formerly enslaved Black Americans, jazz wove African rhythmic complexity with European harmony. It was the first truly American art form, and it was Black. Every major jazz innovator was building a new language of freedom.",
+      "frequency_signature": {
+        "sub_bass": 0.5,
+        "bass_warmth": 0.9,
+        "vocal_presence": 0.45,
+        "brightness": 0.65,
+        "groove_weight": 0.85
+      },
+      "audio_feature_hints": {
+        "acousticness_floor": 0.4,
+        "energy_range": [0.25, 0.7],
+        "tempo_range": [70, 130]
+      },
+      "sonic_description": "Walking upright bass lines with that warm round resonance. Piano voicings rich with color. Drums that swing rather than pound. Space and silence as musical elements.",
+      "keywords": ["saxophone", "trumpet", "piano", "upright bass", "swing", "bebop", "smooth", "late night", "cool", "warm", "improvisation"]
+    },
+    "gospel": {
+      "catalog_tags": [],
+      "name": "Gospel",
+      "origins": "African American church tradition, merging African spiritual practices with Christian worship. Mahalia Jackson, Kirk Franklin, Aretha Franklin (roots), James Cleveland.",
+      "cultural_roots": "The spiritual heartbeat of Black American culture. Gospel is where emotion becomes sound becomes transcendence. The call-and-response pattern traces directly back to West African griot traditions. Every Black music genre carries gospel’s DNA — soul, R&B, hip-hop, neo-soul.",
+      "frequency_signature": {
+        "sub_bass": 0.3,
+        "bass_warmth": 0.75,
+        "vocal_presence": 0.95,
+        "brightness": 0.65,
+        "groove_weight": 0.65
+      },
+      "audio_feature_hints": {
+        "instrumentalness_ceiling": 0.1,
+        "valence_range": [0.6, 1.0]
+      },
+      "sonic_description": "Voices out front — always. Warm organ chords, rich choir harmonies, and that moment when the congregation and the music become one thing. Emotional weight in every note.",
+      "keywords": ["choir", "spiritual", "church", "uplifting", "gospel", "worship", "voices", "emotional", "powerful", "soul-stirring"]
+    },
+    "soul": {
+      "catalog_tags": ["lofi"],
+      "name": "Soul",
+      "origins": "1950s-60s — Ray Charles, Sam Cooke, Otis Redding, Aretha Franklin, Marvin Gaye, James Brown (early). Merging gospel expressiveness with R&B groove.",
+      "cultural_roots": "Soul took the sacred intensity of gospel and poured it into secular stories of love, loss, and survival. It was music that told the whole truth. Motown brought it to mainstream America while keeping its Black heart intact.",
+      "frequency_signature": {
+        "sub_bass": 0.5,
+        "bass_warmth": 0.88,
+        "vocal_presence": 0.9,
+        "brightness": 0.5,
+        "groove_weight": 0.72
+      },
+      "audio_feature_hints": {
+        "acousticness_range": [0.3, 0.8],
+        "instrumentalness_ceiling": 0.15,
+        "valence_range": [0.4, 0.85]
+      },
+      "sonic_description": "That warm, analog low-end that wraps around you. Vocals that tell you something real. Horns that punctuate the emotion. A rhythm section that breathes together.",
+      "keywords": ["soulful", "warm", "Motown", "classic", "emotional", "powerful vocals", "analog", "vintage", "Sunday morning", "heartfelt"]
+    },
+    "funk": {
+      "catalog_tags": ["hip hop", "electronic"],
+      "name": "Funk",
+      "origins": "Late 1960s-70s — James Brown, Sly and the Family Stone, Parliament-Funkadelic, Bootsy Collins, Rick James",
+      "cultural_roots": "James Brown famously put the ‘One’ — that downbeat — at the center of everything. Funk is rhythm as liberation. It drew from jazz, soul, and blues while creating something entirely new: music that made your body move before your mind understood why.",
+      "frequency_signature": {
+        "sub_bass": 0.85,
+        "bass_warmth": 0.75,
+        "vocal_presence": 0.7,
+        "brightness": 0.55,
+        "groove_weight": 0.95
+      },
+      "audio_feature_hints": {
+        "danceability_floor": 0.75,
+        "energy_range": [0.65, 0.95],
+        "tempo_range": [90, 130]
+      },
+      "sonic_description": "The slap bass that hits you on the downbeat. Tight horn stabs. Syncopated rhythm guitar — the ‘chicken scratch’. Everything is locked in the pocket. The groove IS the message.",
+      "keywords": ["funky", "groove", "bass line", "dance", "rhythm", "pocket", "slap bass", "horns", "Parliament", "James Brown", "body-moving"]
+    },
+    "r_and_b": {
+      "catalog_tags": ["pop", "lofi"],
+      "name": "R&B",
+      "origins": "1940s — evolved from jazz and blues. Louis Jordan, Ruth Brown, Ray Charles. Contemporary: D’Angelo, Erykah Badu, Alicia Keys, H.E.R., SZA, Frank Ocean.",
+      "cultural_roots": "Rhythm and blues was the name white record executives gave to Black popular music. It has always been the most commercially viable expression of Black musical identity — and because of that, the most adapted, borrowed, and (often without credit) stolen. The genuine article has an emotional honesty that can’t be replicated.",
+      "frequency_signature": {
+        "sub_bass": 0.65,
+        "bass_warmth": 0.88,
+        "vocal_presence": 0.9,
+        "brightness": 0.42,
+        "groove_weight": 0.75
+      },
+      "audio_feature_hints": {
+        "instrumentalness_ceiling": 0.2,
+        "valence_range": [0.3, 0.85]
+      },
+      "sonic_description": "Smooth, warm bass underneath vulnerable, expressive vocals. Production that cushions the emotion rather than overwhelming it. That late-night, close-feeling sound.",
+      "keywords": ["smooth", "vocals", "love", "R&B", "neo soul", "slow jam", "emotional", "intimate", "night", "vibe", "SZA", "Frank Ocean"]
+    },
+    "neo_soul": {
+      "catalog_tags": ["lofi", "jazz"],
+      "name": "Neo-Soul",
+      "origins": "1990s-2000s — D’Angelo, Erykah Badu, Lauryn Hill, Maxwell, India.Arie, Musiq Soulchild",
+      "cultural_roots": "Neo-soul was a conscious return to the organic warmth of classic soul while incorporating hip-hop rhythms and jazz harmony. It rejected the over-produced sheen of mainstream 90s R&B in favor of something rawer and more spiritually connected.",
+      "frequency_signature": {
+        "sub_bass": 0.58,
+        "bass_warmth": 0.92,
+        "vocal_presence": 0.88,
+        "brightness": 0.38,
+        "groove_weight": 0.78
+      },
+      "audio_feature_hints": {
+        "acousticness_range": [0.3, 0.75],
+        "instrumentalness_ceiling": 0.2,
+        "tempo_range": [60, 110]
+      },
+      "sonic_description": "Analog warmth you can almost touch. Drums that breathe rather than pound. Bass that rolls rather than thumps. Vocals that feel like a conversation, not a performance.",
+      "keywords": ["neo soul", "conscious", "organic", "Erykah Badu", "D'Angelo", "Lauryn Hill", "warm", "jazzy", "chill", "deep", "soulful", "Sunday"]
+    },
+    "blues": {
+      "catalog_tags": ["folk", "country"],
+      "name": "Blues",
+      "origins": "Deep South, late 1800s — Robert Johnson, Muddy Waters, B.B. King, Howlin’ Wolf, Bessie Smith",
+      "cultural_roots": "The blues is the root of nearly all American popular music. Born from the work songs, spirituals, and field hollers of Black Americans under slavery and its aftermath, the blues codified the 12-bar structure that would birth jazz, rock and roll, country, and hip-hop. To play the blues is to speak the oldest continuous American musical language.",
+      "frequency_signature": {
+        "sub_bass": 0.45,
+        "bass_warmth": 0.88,
+        "vocal_presence": 0.85,
+        "brightness": 0.32,
+        "groove_weight": 0.6
+      },
+      "audio_feature_hints": {
+        "acousticness_range": [0.5, 1.0],
+        "energy_range": [0.2, 0.7]
+      },
+      "sonic_description": "Warm, dark, and honest. Guitar bends that sound like a voice. Vocals that tell the whole unvarnished truth. A feeling that something real happened here.",
+      "keywords": ["blues", "guitar", "raw", "honest", "Delta", "slow burn", "storytelling", "dark", "feeling", "emotional depth", "B.B. King"]
+    },
+    "reggae": {
+      "catalog_tags": ["reggae"],
+      "name": "Reggae",
+      "origins": "Jamaica, 1960s — Bob Marley, Toots and the Maytals, Burning Spear. Deeply connected to the African diaspora and Rastafarian spiritual philosophy.",
+      "cultural_roots": "Reggae carries the consciousness of African diaspora communities — spiritual resistance, celebration of African identity, and the longing for liberation. The off-beat rhythm (the ‘skank’) and the deep bass rumble are a sonic philosophy: let the bass carry the weight, let the spirit ride on top.",
+      "frequency_signature": {
+        "sub_bass": 0.9,
+        "bass_warmth": 0.72,
+        "vocal_presence": 0.7,
+        "brightness": 0.4,
+        "groove_weight": 0.72
+      },
+      "audio_feature_hints": {
+        "energy_range": [0.3, 0.75],
+        "tempo_range": [60, 100],
+        "danceability_range": [0.55, 0.85]
+      },
+      "sonic_description": "The bass line carries everything — deep, round, chest-filling sub-bass that is the spiritual center of the music. The off-beat guitar chop, the rolling drums, the meditative space between notes.",
+      "keywords": ["reggae", "bass", "Rastafari", "Bob Marley", "Jamaica", "spiritual", "conscious", "roots", "riddim", "island", "laid back", "deep bass"]
+    },
+    "lofi": {
+      "catalog_tags": ["lofi", "ambient"],
+      "name": "Lo-Fi / Chill",
+      "origins": "Contemporary genre drawing from hip-hop beats, jazz samples, soul, and ambient music. Popularized by lo-fi hip hop study streams.",
+      "cultural_roots": "Lo-fi is deeply indebted to jazz and soul sampling traditions — it takes the warmth of analog Black music and filters it through a cassette-tape aesthetic. The genre is a descendant of hip-hop’s sampling culture.",
+      "frequency_signature": {
+        "sub_bass": 0.35,
+        "bass_warmth": 0.78,
+        "vocal_presence": 0.2,
+        "brightness": 0.35,
+        "groove_weight": 0.55
+      },
+      "audio_feature_hints": {
+        "acousticness_range": [0.5, 0.95],
+        "instrumentalness_range": [0.5, 1.0],
+        "energy_range": [0.2, 0.55]
+      },
+      "sonic_description": "Warm vinyl crackle, muffled high frequencies, a gentle beat that doesn’t demand attention. Bass that softly fills the room rather than commanding it. Music for thinking.",
+      "keywords": ["chill", "study", "focus", "lofi", "warm", "gentle", "background", "rain", "coffee", "late night", "jazzy beats", "mellow"]
+    }
+  },
+  "frequency_vocabulary": {
+    "chest-thumping": {"sub_bass": 0.95},
+    "bass-heavy": {"sub_bass": 0.9},
+    "deep bass": {"sub_bass": 0.88, "bass_warmth": 0.6},
+    "warm": {"bass_warmth": 0.85},
+    "soulful": {"bass_warmth": 0.8, "vocal_presence": 0.85},
+    "groovy": {"groove_weight": 0.85, "sub_bass": 0.6},
+    "smooth": {"bass_warmth": 0.75, "brightness": 0.35, "vocal_presence": 0.7},
+    "dark": {"brightness": 0.2, "bass_warmth": 0.7},
+    "bright": {"brightness": 0.85},
+    "raw": {"sub_bass": 0.8, "brightness": 0.65},
+    "laid-back": {"groove_weight": 0.55, "bass_warmth": 0.75},
+    "punchy": {"sub_bass": 0.82, "groove_weight": 0.8},
+    "melancholic": {"bass_warmth": 0.7, "brightness": 0.25},
+    "uplifting": {"vocal_presence": 0.8, "brightness": 0.72},
+    "spiritual": {"vocal_presence": 0.9, "bass_warmth": 0.7},
+    "energetic": {"sub_bass": 0.75, "groove_weight": 0.8},
+    "chill": {"sub_bass": 0.3, "bass_warmth": 0.7, "brightness": 0.35},
+    "funky": {"groove_weight": 0.9, "sub_bass": 0.8},
+    "jazzy": {"bass_warmth": 0.88, "groove_weight": 0.8, "brightness": 0.6},
+    "Sunday morning": {"bass_warmth": 0.85, "vocal_presence": 0.8, "brightness": 0.45},
+    "late night": {"bass_warmth": 0.75, "brightness": 0.25, "sub_bass": 0.55},
+    "trap": {"sub_bass": 0.95, "groove_weight": 0.85},
+    "boom bap": {"sub_bass": 0.75, "groove_weight": 0.88, "vocal_presence": 0.75},
+    "conscious": {"vocal_presence": 0.85, "bass_warmth": 0.65},
+    "neo soul": {"bass_warmth": 0.9, "vocal_presence": 0.85, "brightness": 0.38}
+  }
+}

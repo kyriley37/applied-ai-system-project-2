@@ -1,17 +1,25 @@
 """
-Command line runner for the Music Recommender Simulation.
+Command line runner for the Cultural Frequency Music Recommender.
 
-This file helps you quickly run and test your recommender.
-
-You will implement the functions in recommender.py:
-- load_songs
-- score_song
-- recommend_songs
+Usage:
+  python -m src.main          # interactive mode (requires ANTHROPIC_API_KEY)
+  python -m src.main --demo   # run pre-built demo profiles without the API
 """
 
+import os
+import argparse
+
+from dotenv import load_dotenv
 from tabulate import tabulate
+
 from .recommender import load_songs, recommend_songs, diverse_recommend_songs, STRATEGIES
 
+load_dotenv()
+
+
+# ---------------------------------------------------------------------------
+# Pre-built profiles
+# ---------------------------------------------------------------------------
 
 PROFILES = {
     "High-Energy Pop": {
@@ -52,9 +60,7 @@ PROFILES = {
     },
 }
 
-
 ADVERSARIAL_PROFILES = {
-    # Genre that does not exist in the catalog — +2.0 never fires
     "Ghost Genre (metal/angry)": {
         "genre": "metal",
         "mood": "angry",
@@ -64,7 +70,6 @@ ADVERSARIAL_PROFILES = {
         "danceability": 0.60,
         "likes_acoustic": False,
     },
-    # Mood says slow/chill, energy says maximum intensity — internal contradiction
     "High Energy + Chill Mood": {
         "genre": "lofi",
         "mood": "chill",
@@ -74,7 +79,6 @@ ADVERSARIAL_PROFILES = {
         "danceability": 0.50,
         "likes_acoustic": True,
     },
-    # likes_acoustic=True but energy/tempo target loud rock — acoustic tracks are low-energy
     "Acoustic Headbanger": {
         "genre": "rock",
         "mood": "intense",
@@ -84,7 +88,6 @@ ADVERSARIAL_PROFILES = {
         "danceability": 0.70,
         "likes_acoustic": True,
     },
-    # No genre or mood — pure numeric scoring, no categorical boosts possible
     "No Genre No Mood (numeric only)": {
         "genre": "",
         "mood": "",
@@ -94,7 +97,6 @@ ADVERSARIAL_PROFILES = {
         "danceability": 0.65,
         "likes_acoustic": False,
     },
-    # All targets at extreme 0.0 — tests the floor of the scoring formula
     "Extreme Low (everything 0)": {
         "genre": "ambient",
         "mood": "chill",
@@ -107,8 +109,11 @@ ADVERSARIAL_PROFILES = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Shared formatting helpers
+# ---------------------------------------------------------------------------
+
 def _wrap_reasons(explanation: str, max_reasons: int = 4, width: int = 38) -> str:
-    """Format pipe-separated reasons as a numbered list, capped at max_reasons."""
     import textwrap
     reasons = explanation.split(" | ")[:max_reasons]
     lines = []
@@ -150,10 +155,120 @@ def print_recommendations(label: str, user_prefs: dict, songs: list, k: int = 3)
     ))
 
 
-def main() -> None:
-    songs = load_songs("data/songs.csv")
-    print(f"Loaded songs: {len(songs)}")
+# ---------------------------------------------------------------------------
+# Interactive mode — powered by Claude
+# ---------------------------------------------------------------------------
 
+def interactive_mode(songs: list) -> None:
+    from .claude_agent import parse_user_intent, explain_recommendations
+    from .cultural_retriever import load_kb, retrieve_cultural_context
+    from .frequency_profile import freq_to_audio_prefs, freq_to_weights
+    from .logger import setup_logger, log_api_call, log_retrieval, log_scoring, log_guardrail
+
+    logger = setup_logger()
+    kb = load_kb()
+
+    print("\n" + "=" * 62)
+    print("  Cultural Frequency Music Recommender")
+    print("  Powered by Claude + Black American Music Heritage")
+    print("=" * 62)
+    print("\nDescribe what you want to hear in your own words.")
+    print("Examples:")
+    print('  "I want that deep bass Sunday morning soul feel"')
+    print('  "Something groovy and funky for a late-night drive"')
+    print('  "Chill jazzy vibes for studying, warm not bright"')
+    print("\nType 'quit' to exit.\n")
+
+    while True:
+        try:
+            user_input = input("What are you feeling? > ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nGoodbye.")
+            break
+
+        if not user_input:
+            continue
+        if user_input.lower() in ("quit", "exit", "q"):
+            print("Goodbye.")
+            break
+
+        if len(user_input) > 500:
+            print("Please keep your request under 500 characters.\n")
+            log_guardrail(logger, "input_too_long", False)
+            continue
+
+        print("\nReading your vibe...", end="", flush=True)
+
+        try:
+            # Step 1: Parse intent via Claude (structured output)
+            parsed = parse_user_intent(user_input)
+            print(" done.\n")
+            log_api_call(logger, "intent_parser", user_input, parsed.get("reasoning", ""))
+
+            # Step 2: RAG — retrieve cultural context from knowledge base
+            cultural_context = retrieve_cultural_context(
+                parsed.get("cultural_query", []),
+                parsed.get("freq_profile", {}),
+                kb,
+            )
+            log_retrieval(logger, parsed.get("cultural_query", []), cultural_context)
+
+            # Step 3: Map frequency profile → augmented audio prefs + custom weights
+            merged_prefs = freq_to_audio_prefs(
+                parsed.get("freq_profile", {}),
+                parsed.get("user_prefs", {}),
+            )
+            freq_weights = freq_to_weights(parsed.get("freq_profile", {}))
+
+            # Step 4: Score and rank songs
+            results = recommend_songs(merged_prefs, songs, k=5, weights=freq_weights)
+            log_scoring(logger, merged_prefs, results)
+
+            # Step 5: Display ranked table
+            print("Your frequencies:\n")
+            rows = []
+            for rank, (song, score, _explanation) in enumerate(results, start=1):
+                rows.append([
+                    f"#{rank}",
+                    f"{song['title']}\n{song['artist']}",
+                    f"{song['genre']}\n{song['mood']}",
+                    f"{song['energy']:.2f}",
+                    f"{score:.2f}",
+                ])
+            print(tabulate(
+                rows,
+                headers=["", "Title / Artist", "Genre / Mood", "Energy", "Score"],
+                tablefmt="rounded_outline",
+                colalign=("center", "left", "left", "center", "center"),
+            ))
+
+            # Step 6: Stream cultural explanation via Claude
+            print()
+            explanation = explain_recommendations(results, cultural_context, user_input)
+            log_api_call(logger, "explainer", user_input[:100], explanation[:100])
+            print()
+
+        except RuntimeError as e:
+            print(f"\nError: {e}")
+            break
+
+        except Exception as e:
+            log_guardrail(logger, f"{type(e).__name__}: {e}", True)
+            print(f"\nSomething went wrong ({type(e).__name__}). "
+                  "Falling back to standard recommendations.\n")
+            fallback = recommend_songs(
+                {"energy": 0.5, "genre": "", "mood": ""}, songs, k=3
+            )
+            for rank, (song, _score, _) in enumerate(fallback, 1):
+                print(f"  #{rank} {song['title']} — {song['artist']} ({song['genre']})")
+            print()
+
+
+# ---------------------------------------------------------------------------
+# Demo mode
+# ---------------------------------------------------------------------------
+
+def demo_mode(songs: list) -> None:
     for label, prefs in PROFILES.items():
         print_recommendations(label, prefs, songs, k=3)
 
@@ -161,7 +276,6 @@ def main() -> None:
     for label, prefs in ADVERSARIAL_PROFILES.items():
         print_recommendations(label, prefs, songs, k=5)
 
-    # --- Strategy comparison ---
     comparison_profile = PROFILES["Chill Lofi"]
     print("\n\n*** STRATEGY COMPARISON — Chill Lofi profile ***")
     for strategy in STRATEGIES:
@@ -170,7 +284,6 @@ def main() -> None:
         for rank, (song, score, _) in enumerate(results, start=1):
             print(f"  #{rank}  {song['title']} ({song['genre']}, {song['mood']})  score={score:.2f}")
 
-    # --- Diversity penalty comparison ---
     print(f"\n\n{'=' * 72}")
     print("  DIVERSITY PENALTY — Chill Lofi profile")
     print(f"{'=' * 72}")
@@ -200,6 +313,34 @@ def main() -> None:
                    headers=["", "Title / Artist", "Genre", "Raw", "Eff", "Penalty", "Why"],
                    tablefmt="rounded_outline",
                    colalign=("center", "left", "left", "center", "center", "center", "left")))
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Cultural Frequency Music Recommender")
+    parser.add_argument("--demo", action="store_true",
+                        help="Run pre-built demo profiles (no API key required)")
+    args = parser.parse_args()
+
+    songs = load_songs("data/songs.csv")
+    print(f"Loaded {len(songs)} songs.")
+
+    if args.demo:
+        demo_mode(songs)
+        return
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    if not api_key:
+        print("\nNo ANTHROPIC_API_KEY found in environment.")
+        print("Add it to a .env file (see .env.example), then run again.")
+        print("Running demo mode instead...\n")
+        demo_mode(songs)
+        return
+
+    interactive_mode(songs)
 
 
 if __name__ == "__main__":

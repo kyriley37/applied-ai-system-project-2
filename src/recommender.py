@@ -29,12 +29,31 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        prefs = {
+            "genre": user.favorite_genre,
+            "mood": user.favorite_mood,
+            "energy": user.target_energy,
+            "likes_acoustic": user.likes_acoustic,
+        }
+        raw_songs = [s.__dict__ for s in self.songs]
+        results = recommend_songs(prefs, raw_songs, k=k)
+        ids = {s["id"] for s, _, _ in results}
+        return [s for s in self.songs if s.id in ids][:k]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        reasons = []
+        if song.genre == user.favorite_genre:
+            reasons.append(f"matches your favourite genre ({song.genre})")
+        if song.mood == user.favorite_mood:
+            reasons.append(f"fits your preferred mood ({song.mood})")
+        energy_diff = abs(song.energy - user.target_energy)
+        if energy_diff <= 0.2:
+            reasons.append(f"energy level is close to your target ({song.energy:.2f})")
+        if user.likes_acoustic and song.acousticness > 0.6:
+            reasons.append("has the acoustic quality you enjoy")
+        if not reasons:
+            return f"'{song.title}' was selected based on overall audio feature match."
+        return f"'{song.title}' by {song.artist} was recommended because it {', '.join(reasons)}."
 
 def load_songs(csv_path: str) -> List[Dict]:
     """Read a CSV file of songs and return each row as a typed dictionary."""
@@ -191,13 +210,23 @@ def score_song(user_prefs: Dict, song: Dict, weights: Optional[Dict] = None) -> 
     return (score, reasons)
 
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, strategy: str = "balanced") -> List[Tuple[Dict, float, str]]:
-    """Score all songs using the given strategy and return the top k as (song, score, explanation)."""
-    weights = STRATEGIES.get(strategy, STRATEGIES["balanced"])
+def recommend_songs(
+    user_prefs: Dict,
+    songs: List[Dict],
+    k: int = 5,
+    strategy: str = "balanced",
+    weights: Optional[Dict] = None,
+) -> List[Tuple[Dict, float, str]]:
+    """Score all songs and return the top k as (song, score, explanation).
+
+    Pass ``weights`` to override the strategy lookup entirely — used by the
+    frequency-profile mapper to inject custom scoring weights.
+    """
+    w = weights if weights is not None else STRATEGIES.get(strategy, STRATEGIES["balanced"])
     scored = [
         (song, score, " | ".join(reasons) or "No strong matches")
         for song in songs
-        for score, reasons in [score_song(user_prefs, song, weights)]
+        for score, reasons in [score_song(user_prefs, song, w)]
     ]
     return sorted(scored, key=lambda x: x[1], reverse=True)[:k]
 
