@@ -1,103 +1,103 @@
-# Model Card: Music Recommender Simulation
+# Model Card: Cultural Frequency Music Recommender
 
 ## 1. Model Name
 
-**VibeScore 1.0**
+**Cultural Frequency Intelligence v2.0**
+*(Built on VibeScore 1.0 — Music Recommender Simulation, Modules 1–3)*
 
 ---
 
 ## 2. Intended Use
 
-VibeScore 1.0 suggests songs from a small catalog based on a listener's stated taste preferences. The user describes what they want — a favorite genre and mood, numeric targets for energy, tempo, valence, and danceability, whether they like acoustic music, and optional fine-grained preferences like a mood tag or preferred era. The system scores every song against those preferences and returns the top matches with plain-language explanations for each result.
+This system takes a natural language music request — *"I want that deep bass Sunday morning soul feel"* — and returns a ranked list of songs with a culturally-grounded explanation of why they match. It uses Claude (claude-opus-4-7) to parse intent, a RAG pipeline backed by a hand-curated Black American music heritage knowledge base, a frequency profile system that maps cultural descriptors to sonic dimensions, and a weighted scoring engine to rank songs across 10+ audio features.
 
-This system is built for classroom exploration, not real users. It assumes the user can describe their taste accurately and in advance, which real listeners rarely can. It does not learn from listening history or adapt over time. Its purpose is to show how a scoring-based recommender makes decisions and where those decisions can go wrong.
+The system is built for educational purposes and portfolio demonstration. It is not connected to a licensed music catalog — the song data is fictional sample data. Its purpose is to demonstrate how a full AI pipeline can honor cultural knowledge rather than flatten it.
 
 ---
 
 ## 3. How the Model Works
 
-Every song in the catalog has a set of labels and numbers attached to it — things like its genre, mood, how energetic it sounds, how fast it is, whether it feels cheerful or dark, and how acoustic or electronic it sounds. The system also knows each song's popularity score, what decade it came from, whether it feels like a live recording, and how vocal or instrumental it is.
+**Step 1 — Intent Parsing (Claude API):** The user's natural language input is sent to Claude with a structured system prompt. Claude returns a JSON object containing audio preferences (genre, mood, energy, tempo, valence, danceability), a five-dimension frequency profile (sub_bass, bass_warmth, vocal_presence, brightness, groove_weight), a list of cultural query terms, and a reasoning trace.
 
-When a user runs the recommender, they describe what they are looking for using the same kinds of labels and numbers. The system then goes through every song one by one and gives it a score based on how well it matches. A genre match is worth 1 point. A mood match is worth 1 point. A detailed mood tag match is worth 1.5 points. For numeric features like energy and tempo, the system awards partial credit — a song that is close to the target gets most of the points, and a song that is far away gets fewer or none. The closer the match across all features, the higher the total score. Songs are then sorted from highest to lowest and the top results are returned.
+**Step 2 — RAG Retrieval:** The cultural query terms and dominant frequency dimension are used to search `cultural_kb.json` across three passes: direct catalog tag match, dominant frequency dimension match, and keyword match. The retriever returns matched genre entries with their cultural lineage, sonic descriptions, and frequency signatures.
 
-The system also supports four ranking strategies that shift how much each feature matters. The balanced strategy uses all features equally. The genre-first strategy makes genre the dominant signal. The mood-first strategy prioritizes emotional feel over genre. The energy-focused strategy almost ignores genre and mood and ranks entirely by rhythm and intensity. A user can switch strategies with one change.
+**Step 3 — Frequency Mapping:** The frequency profile is mapped to audio preference overrides (e.g. high sub_bass → low acousticness, high danceability) and custom scoring weights (e.g. high groove_weight → amplify danceability and tempo weights).
 
-Finally, a diversity penalty can be applied at selection time. If a song shares an artist or genre with one already in the results, its effective score is reduced — pushing the system to surface a wider variety of music.
+**Step 4 — Scoring Engine:** Every song in the catalog is scored against the merged preferences. Categorical matches (genre, mood) earn fixed points. Continuous features (energy, tempo, valence, danceability, liveness, instrumentalness) earn partial credit based on proximity to the target. Songs are sorted by total score and the top K are returned.
+
+**Step 5 — Cultural Explanation (Claude API, streaming):** The top K songs, retrieved cultural context, and original user input are passed to Claude, which streams a 3-5 sentence explanation connecting the recommendations to Black American music history and the specific frequency characteristics the listener is reaching for.
+
+The system also supports four ranking strategies (balanced, genre-first, mood-first, energy-focused), a greedy diversity penalty that reduces scores for repeated artists and genres, a structured logger, and a heuristic fallback that activates if the Claude API is unavailable.
 
 ---
 
 ## 4. Data
 
-The catalog contains 17 songs across 14 genres including pop, lofi, rock, jazz, ambient, synthwave, indie pop, classical, folk, hip hop, electronic, reggae, world, and country. Moods represented include happy, chill, intense, relaxed, focused, moody, nostalgic, reflective, energetic, dreamy, adventurous, and romantic. Each song also carries a detailed mood tag (euphoric, focused, aggressive, melancholic, motivational, dreamy, nostalgic, uplifting, adventurous), a popularity score, a release decade, a liveness score, and an instrumentalness score.
+**Song catalog:** `songs.csv` contains fictional sample songs across 14 genres (pop, lofi, rock, jazz, ambient, synthwave, indie pop, classical, folk, hip hop, electronic, reggae, world, country). Each song has 15 audio features including energy, tempo, valence, danceability, acousticness, liveness, instrumentalness, popularity, release decade, genre, mood, and mood tag. The catalog was generated as sample data — the artists and titles are not real.
 
-The dataset was hand-crafted for this project. It skews toward modern music — 8 of 17 songs are tagged as 2020s, 7 as 2010s, and only 3 as 2000s or earlier. There is no music from before 2000 except for a few jazz, classical, and reggae tracks. Most genres appear only once. There is no representation of genres like R&B, metal, blues, gospel, Latin, K-pop, or country-pop. The data mostly reflects a Western, English-language taste profile and would not generalize to global listeners.
+**Cultural knowledge base:** `cultural_kb.json` was hand-curated and contains 10 genre entries covering hip-hop, jazz, gospel, soul, funk, R&B, neo-soul, blues, reggae, and lo-fi. Each entry includes cultural origins, frequency signatures, audio feature hints, sonic descriptions, and keywords. A frequency vocabulary section maps cultural terms (soulful, groovy, warm, chest-thumping) to frequency dimension values.
 
 ---
 
 ## 5. Strengths
 
-The system works best when the user's taste profile closely matches one or two songs in the catalog. A "Chill Lofi" user who wants low energy, slow tempo, and acoustic sound gets highly relevant results — Midnight Coding scored 9.13 out of 12.5 with every feature firing. The explanations are also a genuine strength: every result comes with a numbered list of reasons, so a user can immediately see why a song was chosen and whether those reasons make sense to them. That kind of transparency is rare in real recommenders.
+The system's biggest strength is the frequency profile system. By translating cultural descriptors into five sonic dimensions — sub_bass, bass_warmth, vocal_presence, brightness, groove_weight — it can surface relevant songs from genres that don't share a label with the user's request. A "Sunday morning soul feel" query returned reggae, jazz, country, lofi, and world music — five different genres that all share the same warm, mid-tempo sonic pocket.
 
-The strategy switching also works well in practice. Running the same Chill Lofi profile through all four strategies produced four different #3 results, showing that the system is genuinely sensitive to how features are weighted. The mood-first strategy in particular surfaced Spacewalk Thoughts (ambient, chill) that the balanced strategy missed — a cross-genre discovery driven purely by emotional match.
+The RAG architecture keeps Claude's cultural explanations grounded. Instead of generating cultural context from training data (which can hallucinate), the system retrieves specific lineage information from the knowledge base and passes it as context. The explanations are consistently accurate to the cultural roots they reference.
 
-The diversity penalty is another real improvement. Without it, the top 5 for Chill Lofi included LoRoom twice and was entirely lofi. With the penalty applied, Focus Flow was displaced by Coffee Shop Stories (jazz), Spacewalk Thoughts (ambient), and Moonlit Cabin (country), giving the list genuine variety without sacrificing the top two results.
+The reliability layer also works well. The heuristic fallback activates automatically on API failure, the guardrails log every failure mode, and the 31-test harness catches regressions before they surface in production.
 
 ---
 
 ## 6. Limitations and Bias
 
-The most significant weakness discovered through testing is the **single-song genre trap**: 11 out of 14 genres in the catalog appear only once, so any user whose favorite genre matches that lone song immediately receives it as a near-guaranteed #1 result regardless of how poorly the song fits their energy, tempo, or mood targets. This creates a filter bubble where users of niche genres (rock, jazz, classical, country) are locked into one recommendation with a large score gap to #2, meaning they never discover cross-genre alternatives that might actually fit them better. The weight-shift experiment made this concrete — halving the genre bonus and doubling the energy weight did not change the top result for any of the four main profiles, because a single strong genre match still outscored everything else.
+**Catalog bias:** The song catalog is fictional and contains only one or two songs per genre. This means genre label matches are near-guaranteed top results regardless of how well the song fits the user's numeric preferences. A real catalog of hundreds of songs would allow the numeric scoring to do more meaningful work.
 
-A second bias appears in the "High Energy + Chill Mood" adversarial test: when a user's categorical preferences (genre, mood) conflict with their numeric ones (energy), the categorical bonuses always win. The system recommended slow lofi tracks to a user who explicitly asked for energy 0.95. Real recommenders address this by requiring a minimum threshold on numeric fit before applying categorical boosts.
+**Genre label dominance:** Categorical matches (genre, mood) award fixed points that can outweigh continuous feature mismatches. The "High Energy + Chill Mood" adversarial profile exposed this — slow lofi songs were recommended to a user with energy target 0.95 because the genre and mood labels overrode the energy penalty.
 
-The dataset itself is biased toward modern, English-language, Western music. Users whose taste centers on older decades, non-Western genres, or styles like R&B, metal, or Latin music would receive poor results not because the scoring logic is wrong but because the catalog does not represent them at all.
+**Hand-designed frequency dimensions:** The five frequency dimensions were designed based on cultural research and personal knowledge of Black American music, not derived from data. They capture what matters about the sonic identity of these genres, but they remain a simplification. Some musical vibes don't map cleanly onto these five dimensions.
+
+**No real song data:** Because the catalog is fictional, recommendations cannot map to actual artists a user could go listen to. This limits the system's real-world utility and means the cultural explanations Claude generates cannot be validated against actual tracks.
 
 ---
 
 ## 7. Evaluation
 
-I tested four normal profiles and five adversarial profiles by running the recommender and reading the ranked output for each one.
+**Automated testing:** 31 tests across 6 classes in `tests/test_harness.py` — all passing. Tests cover: consistency (same profile → same top-3 across runs), precision (top result genre matches profile), strategy coverage (all 4 strategies return valid results), diversity (penalty correctly spreads genres), edge cases (ghost genres, extreme values, empty labels, k > catalog), and frequency mapper unit tests.
 
-**Profiles tested**
+**Adversarial profiles tested:**
+- Ghost Genre (metal/angry — neither exists in catalog): system fell back to pure numeric scoring, returned rock as closest match
+- High Energy + Chill Mood (contradictory profile): categorical labels won over numeric targets — lofi songs recommended for energy 0.95 request
+- Acoustic Headbanger (acoustic preference + rock/intense): genre and mood match won, acoustic preference silently ignored
+- No Genre No Mood (numeric only): pure numeric scoring worked correctly, surfaced diverse cross-genre results
+- Extreme Low (all values 0): system returned valid results without crashing, scores were appropriately low
 
-- High-Energy Pop: genre pop, mood happy, energy 0.88
-- Chill Lofi: genre lofi, mood chill, energy 0.38
-- Deep Intense Rock: genre rock, mood intense, energy 0.92
-- Late Night Jazz: genre jazz, mood relaxed, energy 0.35
-- Ghost Genre: genre metal, mood angry — neither exists in the catalog
-- High Energy + Chill Mood: lofi/chill genre and mood but energy 0.95 — intentional contradiction
-- Acoustic Headbanger: rock/intense with likes_acoustic True — acoustic preference conflicts with the genre
-- No Genre No Mood: empty genre and mood, only numeric targets
-- Extreme Low: all numeric targets set to 0
-
-**What I was looking for**
-
-For normal profiles I checked whether the top result matched the label and whether scores dropped off sensibly below #1. For adversarial profiles I was looking for where the system produced results that would feel wrong to a real listener.
-
-**What surprised me**
-
-The biggest surprise was the High Energy + Chill Mood profile. I expected the high energy target to pull in fast songs, but the system recommended slow lofi tracks instead. Midnight Coding and Library Rain both scored 4.55 even though their energy is around 0.40, far from the 0.95 target. The genre and mood bonuses together outweighed the energy penalty, so the system ignored the contradiction entirely.
-
-The weight-shift experiment was the second surprise. Doubling the energy weight and halving the genre bonus did not change the top result for any profile. The rankings were rigid because when one song dominates on every feature, changing weights just shifts all scores up together without reordering anything.
-
-The Ghost Genre profile showed that the numeric scoring alone is not useless — with no genre or mood match possible, the system still surfaced Storm Runner at #1 based on energy and tempo proximity. But the low ceiling (3.55 out of 12.5) showed how much the categorical bonuses carry normal profiles.
+**What surprised me during testing:** The `BadRequestError` from the Anthropic API was indistinguishable between a malformed request and an empty credit balance. Both triggered the same fallback path. The system appeared functional even when Claude was completely inaccessible — which could give a false sense of reliability. A well-designed system should surface *why* it fell back, not just that it did.
 
 ---
 
-## 8. Future Work
+## 8. AI Collaboration
 
-The most important improvement would be expanding the catalog. With only one or two songs per genre, the system cannot make meaningful recommendations for most users. A catalog of at least 200 songs across evenly distributed genres would let the numeric features do real work instead of the genre label doing almost everything.
+This system was built in close collaboration with Claude Code (claude-sonnet-4-6). The AI wrote the majority of the code across `claude_agent.py`, `cultural_retriever.py`, `frequency_profile.py`, `logger.py`, and the test harness, based on architectural decisions worked through in conversation.
 
-A minimum threshold rule would fix the categorical override problem. Before awarding a genre or mood bonus, the system could require that the song's energy is within a set range of the user's target. That way a lofi song would not earn genre points for a user who wants high-energy music, even if the genre matches.
+**Where AI was most helpful:** Translating personal cultural knowledge into a structured data model. When I described my connection to certain bass frequencies and what "Sunday morning soul feel" meant to me culturally, Claude translated that into five concrete frequency dimensions with specific numeric ranges and a mapping from cultural keywords to audio feature values. That bridge — from personal cultural knowledge to a structured scoring system — became the most distinctive part of the whole project.
 
-Adding listening history would make the system more realistic. Right now every session starts fresh. A simple history that tracks which songs a user has heard before could be used to boost novelty — penalizing songs already heard and rewarding ones from genres the user has not explored yet.
-
-The diversity penalty works but it is blunt. A more refined version could track not just artist and genre but mood tag and energy bracket, preventing the list from clustering around one emotional register even when artists and genres vary.
+**Where AI's suggestion was flawed:** The `explain_recommendations()` function originally used `thinking: {type: "adaptive"}` with streaming. This caused a `BadRequestError` in certain configurations because adaptive thinking and streaming have constraints on `claude-opus-4-7` that weren't surfaced until actual testing. The code was written confidently without flagging this as a potential issue. This reinforced that AI-generated code must be run and tested — not just read and trusted.
 
 ---
 
-## 9. Personal Reflection
+## 9. Future Work
 
-Building this showed me that a recommender system is not really about finding the "best" song — it is about defining what "best" means through weights, rules, and the data you choose to include. Every number in the scoring logic is a judgment call, and small changes to those numbers can completely change what the system prioritizes. The weight-shift experiment made that concrete: I expected doubling the energy weight to shake up the rankings, but the results barely moved because the catalog structure made genre matches so dominant.
+- Replace `songs.csv` with real Spotify API data so recommendations map to actual artists and tracks
+- Expand `cultural_kb.json` with sub-genres: trap, afrobeats, neo-soul, Chicago blues, New Orleans jazz
+- Add a minimum numeric fit threshold before categorical bonuses fire — prevents label dominance over strong numeric mismatches
+- Cache parsed intent across a session so repeated similar queries reuse the frequency profile
+- Add a confidence signal to the output — the current score (e.g. 11.22/12.5) already functions as one, but surfacing it as an explicit "how confident is this match" metric would improve transparency
 
-The adversarial profiles were the most valuable part of the project. Testing a "High Energy + Chill Mood" user or a "Ghost Genre" user revealed failure modes that normal testing would never surface. Real AI systems are tested the same way — engineers deliberately try to break them to find edge cases before users do. The fact that my system confidently recommended slow, quiet lofi tracks to a user who said they wanted intense high-energy music is exactly the kind of silent failure that would go unnoticed without that kind of adversarial thinking.
+---
+
+## 10. Reflection
+
+Building this project changed how I think about AI systems. The hardest part wasn't the code — it was deciding what the system should *know* and *care about*. Writing `cultural_kb.json` by hand forced me to think carefully about Black American music history: why the 808 bass carries the weight it does, where the gospel-to-soul-to-hip-hop lineage shows up in the actual frequency spectrum. That knowledge doesn't come from a model's training data — it comes from people. The RAG architecture made me realize that the most important part of a good AI system is often the knowledge you curate *before* the model ever sees a query.
+
+I also learned that reliability is a design choice, not an afterthought. The heuristic fallback, input guardrails, structured logger, and test harness weren't extras added at the end — they were what made the system trustworthy enough to actually use. A recommendation that comes back with a confident cultural explanation built on hallucinated context is worse than no recommendation at all. Every layer of this pipeline exists to make sure the output earns its confidence.
