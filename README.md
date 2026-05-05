@@ -1,5 +1,5 @@
 # Cultural Frequency Music Recommender
-### Powered by Claude + Black American Music Heritage
+
 
 **Video Walkthrough:** [Watch on Loom](https://www.loom.com/share/f8efa7230c7a448c99b13834aa7d1a11)
 
